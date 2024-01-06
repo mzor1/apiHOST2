@@ -12,11 +12,10 @@ module.exports = {
     },
     getAllProduct: async (req, res) => {
         try {
-            const products = await Product.find().sort({ createdAt: -1 })
-            res.status(200).json(products)
+            const products = await Product.find({}).sort({ createdAt: -1 })
+            res.status(200).json({products})
         } catch (error) {
             res.status(500).json("Failed to get Products all")
-
         }
     },
     getProduct: async (req, res) => {
@@ -29,23 +28,26 @@ module.exports = {
     },
     searchProduct: async (req, res) => {
         try {
-            const result = Product.aggregate(
-                [
-                    {
-                        $search: {
-                            index: "MyShopApp",
-                            text: {
-                                query: req.params.key,
-                                path: {
-                                    wildcard: "*"
-                                }
-                            }
-                        }
-                    }
-                ]
-            )
+            const searchedProducts = await Product.find({ supplier: req.params.key} ).exec();
+            res.status(200).json({searchedProducts})
 
-            res.status(200).json(result)
+            // const result = Product.aggregate(
+            //     [
+            //         {
+            //             $search: {
+            //                 index: "MyShopApp",
+            //                 text: {
+            //                     query: req.params.key,
+            //                     path: {
+            //                         wildcard: "*"
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     ]
+            // )
+
+            // res.status(200).json(result)
         } catch (error) {
             res.status(500).json("Failed to get Products search")
         }
